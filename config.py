@@ -1,18 +1,13 @@
 import os
-from dotenv import load_dotenv
 
-# Cargar variables de entorno desde .env
-load_dotenv()
-
-# Definir variables de configuración
+# Intentar obtener las variables de entorno
 DB_PASS = os.getenv("DB_PASS")
 DB_NAME = os.getenv("DB_NAME")
 DB_COLLECTION = os.getenv("DB_COLLECTION")
 
-# Validar que las variables de entorno existan
-missing_vars = [var for var in ["DB_PASS", "DB_NAME", "DB_COLLECTION"] if not locals()[var]]
+# Imprimir las variables para depuración (esto se verá en los logs de Render)
+print(f"🔍 DEBUG: DB_PASS={DB_PASS}, DB_NAME={DB_NAME}, DB_COLLECTION={DB_COLLECTION}")
 
-if missing_vars:
-    print(f"⚠️ Advertencia: Faltan variables de entorno: {', '.join(missing_vars)}")
-else:
-    print("✅ Variables de entorno cargadas correctamente")
+# Validar que las variables de entorno existan
+if not DB_PASS or not DB_NAME or not DB_COLLECTION:
+    raise ValueError("❌ ERROR: Faltan variables de entorno requeridas en Render")
