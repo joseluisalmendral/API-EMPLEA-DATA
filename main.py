@@ -32,7 +32,12 @@ def debug_data():
     try:
         # Recuperar los primeros 5 documentos para depuración
         sample_data = list(collection.find().limit(5))
-        return {"sample_data": sample_data}
+        return {
+            "sample_data": sample_data,
+            'db': DB_COLLECTION,
+            'pass': DB_PASS,
+            'colec': DB_COLLECTION
+            }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
