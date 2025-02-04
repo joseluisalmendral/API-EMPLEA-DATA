@@ -43,15 +43,6 @@ def debug_data():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/check-fields")
-def check_fields():
-    try:
-        # Extraer un documento para inspección
-        sample_document = collection.find_one()
-        serialized_document = serialize_document(sample_document)
-        return {"sample_document": serialized_document}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/get-top-skills")
 def get_top_skills():
@@ -83,5 +74,45 @@ def get_top_skills():
 
         return {"top_skills": top_skills_json}
 
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/location-distribution")
+def location_distribution():
+    """
+    Obtiene la distribución de ofertas de empleo por ubicación desde MongoDB.
+    Retorna los datos ordenados en JSON.
+    """
+    try:
+        pipeline = [
+            { "$group": { "_id": "$Ubicacion", "count": { "$sum": 1 } } },
+            { "$sort": { "count": -1 } }
+        ]
+        results = list(collection.aggregate(pipeline))
+        df = pd.DataFrame(results)
+        df.columns = ["Ubicación", "Frecuencia"]
+        return df.to_dict(orient="records")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/job-offers-over-time")
+def job_offers_over_time():
+    """
+    Obtiene la evolución de ofertas laborales por categoría a lo largo del tiempo.
+    Retorna los datos en formato JSON.
+    """
+    try:
+        pipeline = [
+            { "$group": { "_id": { "categoria": "$cat_original", "mes": { "$substr": ["$fecha", 0, 7] } }, "count": { "$sum": 1 } } },
+            { "$sort": { "_id.mes": 1 } }
+        ]
+        results = list(collection.aggregate(pipeline))
+        formatted_results = [
+            {"Categoría": d["_id"]["categoria"], "Mes": d["_id"]["mes"], "Cantidad de Ofertas": d["count"]}
+            for d in results
+        ]
+        return formatted_results
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
