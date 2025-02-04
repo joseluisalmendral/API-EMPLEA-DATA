@@ -39,12 +39,7 @@ def debug_data():
     try:
         # Recuperar los primeros 5 documentos para depuración
         sample_data = [serialize_document(doc) for doc in collection.find().limit(5)]
-        return {
-            "sample_data": sample_data,
-            "db": DB_NAME,
-            "pass": DB_PASS,
-            "colec": DB_COLLECTION
-        }
+        return {"sample_data": sample_data}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -58,7 +53,7 @@ def check_fields():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/prueba")
+@app.get("/get-top-skills")
 def get_top_skills():
     try:
         # Definir el pipeline de agregación en MongoDB
