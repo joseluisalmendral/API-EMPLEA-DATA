@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from pymongo import MongoClient
-from config import DB_PASS, DB_NAME, DB_COLLECTION
+from config import DB_PASS
+from config import DB_COLLECTION
+from config import DB_NAME
 import pandas as pd
 
 # Configurar la conexión con MongoDB Atlas
@@ -34,7 +36,7 @@ def debug_data():
         sample_data = list(collection.find().limit(5))
         return {
             "sample_data": sample_data,
-            'db': DB_COLLECTION,
+            'db': DB_NAME,
             'pass': DB_PASS,
             'colec': DB_COLLECTION
             }
