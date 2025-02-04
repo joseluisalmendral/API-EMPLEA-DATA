@@ -1,8 +1,7 @@
+from bson import ObjectId
 from fastapi import FastAPI, HTTPException
 from pymongo import MongoClient
-from config import DB_COLLECTION
-from config import DB_PASS
-from config import DB_NAME
+from config import DB_COLLECTION, DB_PASS, DB_NAME
 import pandas as pd
 
 # Configurar la conexión con MongoDB Atlas
@@ -24,35 +23,40 @@ collection = db[DB_COLLECTION]
 # Crear la API con FastAPI
 app = FastAPI()
 
+# Función para serializar ObjectId
+def serialize_document(document):
+    if not document:
+        return None
+    document["_id"] = str(document["_id"])  # Convierte ObjectId a string
+    return document
+
 @app.get("/")
 def read_root():
     return {"message": "API funcionando correctamente"}
-
 
 @app.get("/debug")
 def debug_data():
     try:
         # Recuperar los primeros 5 documentos para depuración
-        sample_data = list(collection.find().limit(5))
+        sample_data = [serialize_document(doc) for doc in collection.find().limit(5)]
         return {
             "sample_data": sample_data,
-            'db': DB_NAME,
-            'pass': DB_PASS,
-            'colec': DB_COLLECTION
-            }
+            "db": DB_NAME,
+            "pass": DB_PASS,
+            "colec": DB_COLLECTION
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.get("/check-fields")
 def check_fields():
     try:
         # Extraer un documento para inspección
         sample_document = collection.find_one()
-        return {"sample_document": sample_document}
+        serialized_document = serialize_document(sample_document)
+        return {"sample_document": serialized_document}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.get("/prueba")
 def get_top_skills():
@@ -72,7 +76,9 @@ def get_top_skills():
         if not skills:
             return {"message": "No se encontraron datos en la colección para el campo 'Skills'"}
 
+        # Convertir los resultados en un DataFrame y serializar los IDs
         df_skills = pd.DataFrame(skills)
+        df_skills["_id"] = df_skills["_id"].apply(str)  # Convierte ObjectId a string
 
         # Renombrar columnas
         df_skills.columns = ["Skill", "Frecuencia"]
