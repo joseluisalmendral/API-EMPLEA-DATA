@@ -1,17 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from pymongo import MongoClient
-import os
+from config import DB_PASS, DB_NAME, DB_COLLECTION
 import pandas as pd
-from dotenv import load_dotenv
-
-# Cargar variables de entorno
-load_dotenv()
 
 # Configurar la conexión con MongoDB Atlas
-DB_PASS = os.getenv("DB_PASS")
-DB_NAME = os.getenv("DB_NAME")
-DB_COLLECTION = os.getenv("DB_COLLECTION")
-
 MONGO_URI = f"mongodb+srv://root:{DB_PASS}@cluster0.pse9r.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 # Conectar con la base de datos
