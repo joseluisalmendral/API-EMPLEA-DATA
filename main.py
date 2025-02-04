@@ -26,6 +26,27 @@ app = FastAPI()
 def read_root():
     return {"message": "API funcionando correctamente"}
 
+
+@app.get("/debug")
+def debug_data():
+    try:
+        # Recuperar los primeros 5 documentos para depuración
+        sample_data = list(collection.find().limit(5))
+        return {"sample_data": sample_data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/check-fields")
+def check_fields():
+    try:
+        # Extraer un documento para inspección
+        sample_document = collection.find_one()
+        return {"sample_document": sample_document}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/prueba")
 def get_top_skills():
     try:
@@ -39,6 +60,11 @@ def get_top_skills():
 
         # Ejecutar la consulta y convertir a DataFrame
         skills = list(collection.aggregate(pipeline))
+
+        # Verificar si la consulta devolvió resultados
+        if not skills:
+            return {"message": "No se encontraron datos en la colección para el campo 'Skills'"}
+
         df_skills = pd.DataFrame(skills)
 
         # Renombrar columnas
