@@ -169,8 +169,30 @@ class JobIDsRequest(BaseModel):
 @app.post("/get_jobs_by_ids/")
 async def get_jobs_by_ids(request: JobIDsRequest):
     try:
-        object_ids = [ObjectId(job_id) for job_id in request.job_ids]
+        # Verifica si la lista de IDs está vacía
+        if not request.job_ids:
+            raise HTTPException(status_code=400, detail="La lista de job_ids está vacía")
+
+        # Convertir los IDs a ObjectId de manera segura
+        object_ids = []
+        for job_id in request.job_ids:
+            try:
+                object_ids.append(ObjectId(job_id))
+            except Exception:
+                raise HTTPException(status_code=400, detail=f"ID no válido: {job_id}")
+
+        # Consultar la base de datos excluyendo 'Skills_vectorizadas'
         jobs = list(collection.find({"_id": {"$in": object_ids}}, {"Skills_vectorizadas": 0}))
+
+        # Convertir _id de ObjectId a string
+        for job in jobs:
+            job["_id"] = str(job["_id"])
+
+        # Si no se encuentran ofertas, devolver un mensaje claro
+        if not jobs:
+            return {"message": "No se encontraron ofertas con esos IDs"}
+
         return jobs
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al recuperar ofertas: {str(e)}")
