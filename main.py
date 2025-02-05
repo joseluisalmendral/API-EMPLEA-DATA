@@ -29,6 +29,14 @@ collection = db[DB_COLLECTION]
 # Crear la API con FastAPI
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # O especifica ["http://localhost:5173"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Función para serializar ObjectId
 def serialize_document(document):
     if not document:
