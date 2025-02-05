@@ -3,3 +3,6 @@ uvicorn
 pymongo
 python-dotenv
 pandas
+scikit-learn
+numpy
+pydantic
