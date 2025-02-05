@@ -38,7 +38,19 @@ def serialize_document(document):
 
 @app.get("/")
 def read_root():
-    return {"message": "API funcionando correctamente"}
+    """
+    Devuelve una lista con todos los endpoints disponibles en la API.
+    """
+    endpoints = []
+    for route in app.routes:
+        if hasattr(route, "methods"):  # Filtra solo las rutas válidas
+            methods = list(route.methods - {"HEAD", "OPTIONS"})  # Excluye HEAD y OPTIONS
+            endpoints.append({
+                "path": route.path,
+                "methods": methods,
+                "name": route.name
+            })
+    return {"endpoints": endpoints}
 
 @app.get("/debug")
 def debug_data():
