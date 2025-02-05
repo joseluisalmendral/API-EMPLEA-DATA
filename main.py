@@ -8,6 +8,7 @@ import pandas as pd
 import pickle
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+from fastapi.middleware.cors import CORSMiddleware
 
 
 # Configurar la conexión con MongoDB Atlas
