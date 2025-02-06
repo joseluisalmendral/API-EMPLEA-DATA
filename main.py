@@ -217,3 +217,35 @@ async def get_jobs_by_ids(request: JobIDsRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al recuperar ofertas: {str(e)}")
+
+
+@app.get("/weighted-skills/")
+def weighted_skills(category: str = Query(..., description="Valor de 'cat_original' para filtrar (por ejemplo, 'Data Science')")):
+    """
+    Devuelve una lista de skills y su frecuencia (ponderación) para los documentos
+    que tengan un valor específico en 'cat_original'.
+    """
+    try:
+        pipeline = [
+            {"$match": {"cat_original": category}},
+            {"$unwind": "$Skills"},
+            {"$group": {"_id": "$Skills", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}}
+        ]
+        results = list(collection.aggregate(pipeline))
+        weighted_skills = [{"skill": d["_id"], "count": d["count"]} for d in results]
+        return {"weighted_skills": weighted_skills}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/categories/")
+def get_categories():
+    """
+    Devuelve todos los valores distintos de la clave 'cat_original' en la colección.
+    """
+    try:
+        categories = collection.distinct("cat_original")
+        return {"categories": categories}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
