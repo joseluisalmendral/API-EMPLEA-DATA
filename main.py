@@ -223,9 +223,12 @@ async def get_jobs_by_ids(request: JobIDsRequest):
 def weighted_skills(category: str = Query(..., description="Valor de 'cat_original' para filtrar (por ejemplo, 'Data Science')")):
     """
     Devuelve una lista de skills y su frecuencia (ponderación) para los documentos
-    que tengan un valor específico en 'cat_original'.
+    que tengan un valor específico en 'cat_original', junto con el total de ofertas para esa categoría.
     """
     try:
+        # Obtener el total de documentos (ofertas) para la categoría proporcionada
+        total_offers = collection.count_documents({"cat_original": category})
+
         pipeline = [
             {"$match": {"cat_original": category}},
             {"$unwind": "$Skills"},
@@ -234,7 +237,8 @@ def weighted_skills(category: str = Query(..., description="Valor de 'cat_origin
         ]
         results = list(collection.aggregate(pipeline))
         weighted_skills = [{"skill": d["_id"], "count": d["count"]} for d in results]
-        return {"weighted_skills": weighted_skills}
+        
+        return {"weighted_skills": weighted_skills, "total_offers": total_offers}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
