@@ -9,6 +9,7 @@ import pickle
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 from fastapi.middleware.cors import CORSMiddleware
+from classification import identificar_rol
 
 
 # Configurar la conexión con MongoDB Atlas
@@ -253,3 +254,19 @@ def get_categories():
         return {"categories": categories}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+
+class SkillsRequest(BaseModel):
+    skills: List[str]
+
+@app.post("/classify-skills/")
+def classify_skills(request: SkillsRequest):
+    """
+    Recibe una lista de skills y devuelve el rol identificado según el diccionario.
+    """
+    try:
+        puesto = identificar_rol(request.skills)
+        return {"role": puesto}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error durante la clasificación: {str(e)}")
