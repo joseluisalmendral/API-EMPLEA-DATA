@@ -256,7 +256,6 @@ def get_categories():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-
 class SkillsRequest(BaseModel):
     skills: List[str]
 
