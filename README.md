@@ -2,6 +2,10 @@
 
 Esta API está desarrollada con **FastAPI** y se conecta a una base de datos **MongoDB Atlas**. Proporciona datos en formato JSON relacionados con la base de datos de **Emplea Data**, listos para ser utilizados en aplicaciones front-end.
 
+[DOCS API DESPLEGADA](https://api-emplea-data.onrender.com/docs)
+
+(puede tardar un poco debido a que está con el free plan y se apaga por inactividad pero al recibir llamadas se levanta al minuto)
+
 ---
 
 ## 🚀 **Características**
